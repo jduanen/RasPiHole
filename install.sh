@@ -21,12 +21,16 @@ apt update && apt upgrade -y
 # ── 2. Static IP (NetworkManager — Pi OS Bookworm/Trixie) ────────────────
 info "Configuring static IP via NetworkManager..."
 
-# Find the first ethernet connection profile (active or inactive)
-CONN=$(nmcli -t -f NAME,TYPE con show --active 2>/dev/null \
-       | grep ':ethernet' | cut -d: -f1 | head -1)
-[ -z "$CONN" ] && CONN=$(nmcli -t -f NAME,TYPE con show 2>/dev/null \
-       | grep ':ethernet' | cut -d: -f1 | head -1)
-[ -z "$CONN" ] && error "No ethernet connection profile found. Check: nmcli con show"
+# nmcli dev uses type 'ethernet'; nmcli con show uses '802-3-ethernet' — use dev to find the interface first
+ETH_DEV=$(nmcli -t -f DEVICE,TYPE dev 2>/dev/null \
+          | grep ':ethernet' | cut -d: -f1 | head -1)
+[ -z "$ETH_DEV" ] && error "No ethernet device found. Check: nmcli dev"
+
+CONN=$(nmcli -t -f NAME,DEVICE con show --active 2>/dev/null \
+       | grep ":${ETH_DEV}$" | cut -d: -f1 | head -1)
+[ -z "$CONN" ] && CONN=$(nmcli -t -f NAME,DEVICE con show 2>/dev/null \
+       | grep ":${ETH_DEV}$" | cut -d: -f1 | head -1)
+[ -z "$CONN" ] && error "No connection profile found for ${ETH_DEV}. Check: nmcli con show"
 
 CURRENT=$(nmcli -g ipv4.addresses con show "$CONN" 2>/dev/null || true)
 if [ "$CURRENT" = "192.168.166.2/24" ]; then
