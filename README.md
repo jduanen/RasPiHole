@@ -50,19 +50,18 @@ Steps below document what `install.sh` automates. Follow them if you prefer a ma
    sudo apt update && sudo apt upgrade -y
    ```
 
-4. **Configure a static IP**
+4. **Configure a static IP** (Pi OS Bookworm/Trixie uses NetworkManager, not dhcpcd)
    ```bash
-   sudo nano /etc/dhcpcd.conf
-   ```
-   Append at the bottom:
-   ```
-   interface eth0
-   static ip_address=192.168.166.2/24
-   static routers=192.168.166.1
-   static domain_name_servers=127.0.0.1
-   ```
-   ```bash
-   sudo systemctl restart dhcpcd
+   # Find the ethernet connection name (often "Wired connection 1" or "eth0")
+   nmcli con show --active
+
+   # Replace <conn> with that name
+   sudo nmcli con mod "<conn>" \
+       ipv4.method manual \
+       ipv4.addresses "192.168.166.2/24" \
+       ipv4.gateway "192.168.166.1" \
+       ipv4.dns "127.0.0.1"
+   sudo nmcli con up "<conn>"
    ```
 
 5. **Install and configure Unbound**
@@ -134,7 +133,6 @@ dig pi-hole.net @127.0.0.1 -p 5335
 
 | Repo path | Deployed to |
 |---|---|
-| `etc/dhcpcd.conf` | `/etc/dhcpcd.conf` |
 | `etc/unbound/unbound.conf.d/pi-hole.conf` | `/etc/unbound/unbound.conf.d/pi-hole.conf` |
 | `etc/pihole/setupVars.conf` | `/etc/pihole/setupVars.conf` |
 
