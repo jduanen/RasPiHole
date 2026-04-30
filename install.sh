@@ -16,22 +16,27 @@ SETUP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 info "Updating system packages..."
 apt update && apt upgrade -y
 
-# ── 2. Static IP ──────────────────────────────────────────────────────────
-DHCPCD_CONF="/etc/dhcpcd.conf"
-if grep -q "^interface eth0" "$DHCPCD_CONF"; then
-    info "Static IP already present in dhcpcd.conf — skipping."
-else
-    info "Configuring static IP in dhcpcd.conf..."
-    cat >> "$DHCPCD_CONF" << 'EOF'
+# ── 2. Static IP (NetworkManager — Pi OS Bookworm/Trixie) ────────────────
+info "Configuring static IP via NetworkManager..."
 
-# RasPiHole: static IP
-interface eth0
-static ip_address=192.168.166.2/24
-static routers=192.168.166.1
-static domain_name_servers=127.0.0.1
-EOF
-    info "Restarting dhcpcd to apply static IP..."
-    systemctl restart dhcpcd
+# Find the first ethernet connection profile (active or inactive)
+CONN=$(nmcli -t -f NAME,TYPE con show --active 2>/dev/null \
+       | grep ':ethernet' | cut -d: -f1 | head -1)
+[ -z "$CONN" ] && CONN=$(nmcli -t -f NAME,TYPE con show 2>/dev/null \
+       | grep ':ethernet' | cut -d: -f1 | head -1)
+[ -z "$CONN" ] && error "No ethernet connection profile found. Check: nmcli con show"
+
+CURRENT=$(nmcli -g ipv4.addresses con show "$CONN" 2>/dev/null || true)
+if [ "$CURRENT" = "192.168.166.2/24" ]; then
+    info "Static IP already configured on '${CONN}' — skipping."
+else
+    info "Setting static IP on connection '${CONN}'..."
+    nmcli con mod "$CONN" \
+        ipv4.method   manual \
+        ipv4.addresses "192.168.166.2/24" \
+        ipv4.gateway  "192.168.166.1" \
+        ipv4.dns      "127.0.0.1"
+    nmcli con up "$CONN"
     sleep 3
 fi
 
