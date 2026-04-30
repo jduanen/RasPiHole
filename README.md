@@ -100,18 +100,15 @@ Steps below document what `install.sh` automates. Follow them if you prefer a ma
 
 ---
 
-## DHCP Cutover
+## DNS Setup
 
-Pi-hole's built-in DHCP (powered by FTL/dnsmasq) serves all LAN/WLAN leases.
-**Two DHCP servers on the same subnet will conflict** — cut over carefully:
+The AmpliFi Alien keeps serving DHCP. Point it at Pi-hole for DNS:
 
-1. Log into your router and **disable its DHCP server**.
-2. Pi-hole DHCP is already active after install (range: `192.168.166.100–250`).
-3. Reconnect each client (or wait for lease expiry) so it picks up a Pi-hole lease.
-4. Verify active leases in Admin → DHCP.
+- AmpliFi app → tap the router → **Internet** → **DNS Server**
+- Set primary DNS to `192.168.166.2`
 
-Static IP addresses below `.100` (e.g., `.2` for the Pi, `.7` for DGX Spark) are
-outside the dynamic range and safe from conflicts.
+Every device that gets a DHCP lease from the Alien will then use Pi-hole for DNS
+automatically — no per-device configuration needed.
 
 ---
 

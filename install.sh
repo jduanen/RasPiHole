@@ -110,11 +110,10 @@ echo
 echo "  Web UI :  http://192.168.166.2/admin"
 echo "  Reset password :  pihole -a -p"
 echo
-echo -e "${YELLOW}  DHCP CUTOVER — do this once, in order:${NC}"
-echo "  1. Log into your router and DISABLE its DHCP server."
-echo "  2. Pi-hole DHCP is already active (range: 192.168.166.100–250)."
-echo "  3. Reconnect/renew clients so they pick up Pi-hole leases."
-echo "  4. Verify: check Pi-hole admin → DHCP for active leases."
+echo -e "${YELLOW}  DNS SETUP — point your router at Pi-hole:${NC}"
+echo "  In the AmpliFi app: Router → Internet → DNS Server"
+echo "  Set primary DNS to 192.168.166.2"
+echo "  Your router keeps serving DHCP; Pi-hole handles DNS."
 echo
 echo "  Recommended blocklists (add via Admin → Adlists):"
 echo "    https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
