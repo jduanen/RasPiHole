@@ -2,7 +2,9 @@
 # Installs Pi-hole + Unbound on a fresh Raspberry Pi OS Lite (64-bit) image.
 # Must be run as root on the Pi itself; copy this repo's files there first via deploy.sh.
 set -euo pipefail
+trap '' HUP  # survive SSH disconnect when the network interface bounces
 
+LOG=/var/log/raspihole-install.log
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
 info()  { echo -e "${GREEN}[INFO]${NC}  $*"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC}  $*"; }
@@ -36,7 +38,13 @@ else
         ipv4.addresses "192.168.166.2/24" \
         ipv4.gateway  "192.168.166.1" \
         ipv4.dns      "127.0.0.1"
-    nmcli con up "$CONN"
+
+    info "Network will bounce — SSH may disconnect. Install continues in background."
+    info "Follow progress: tail -f ${LOG}"
+    # Detach I/O from the PTY before the bounce so the script survives losing the terminal.
+    exec < /dev/null >> "$LOG" 2>&1
+
+    nmcli con up "$CONN" || true
     sleep 3
 fi
 
