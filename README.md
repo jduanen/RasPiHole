@@ -52,10 +52,11 @@ Steps below document what `install.sh` automates. Follow them if you prefer a ma
 
 4. **Configure a static IP** (Pi OS Bookworm/Trixie uses NetworkManager, not dhcpcd)
    ```bash
-   # Find the ethernet connection name (often "Wired connection 1" or "eth0")
-   nmcli con show --active
+   # Find the ethernet device and its connection profile
+   nmcli dev          # note the DEVICE name for type 'ethernet' (e.g. eth0)
+   nmcli con show     # find the NAME whose DEVICE column matches
 
-   # Replace <conn> with that name
+   # Replace <conn> with that name (e.g. "Wired connection 1")
    sudo nmcli con mod "<conn>" \
        ipv4.method manual \
        ipv4.addresses "192.168.166.2/24" \
