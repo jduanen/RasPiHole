@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+#### Added by JDN
+04-pihole-static-dhcp.conf
+hold
