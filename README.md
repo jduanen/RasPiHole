@@ -7,7 +7,7 @@ resolver), serving DNS and DHCP to the home LAN/WLAN.
 
 ```bash
 # From this machine — copies config files and runs the installer on the Pi
-./deploy.sh [jdn@pihole.local]
+./deploy.sh [jdn@rpihole.local]
 ```
 
 After the script finishes, follow the **DHCP Cutover** steps it prints, then verify
@@ -46,7 +46,7 @@ Steps below document what `install.sh` automates. Follow them if you prefer a ma
 
 3. **Log in and update the system**
    ```bash
-   ssh jdn@pihole.local
+   ssh jdn@rpihole.local
    sudo apt update && sudo apt upgrade -y
    ```
 
@@ -91,7 +91,7 @@ Steps below document what `install.sh` automates. Follow them if you prefer a ma
 8. **DHCP cutover** — see [DHCP Cutover](#dhcp-cutover) below.
 
 9. **Access the web UI**
-   - `http://192.168.166.2/admin` (or `http://pihole.local/admin`)
+   - `http://192.168.166.2/admin` (or `http://rpihole.local/admin`)
    - Reset password: `pihole -a -p`
 
 10. **Add recommended blocklists** — in Admin → Adlists:

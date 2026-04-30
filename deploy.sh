@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Copies config files to the Pi and runs the installer via SSH.
-# Usage: ./deploy.sh [user@host]   (default: jdn@pihole.local)
+# Usage: ./deploy.sh [user@host]   (default: jdn@rpihole.local)
 set -euo pipefail
 
-TARGET="${1:-jdn@pihole.local}"
+TARGET="${1:-jdn@rpihole.local}"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REMOTE_DIR="~/raspihole-setup"
 
